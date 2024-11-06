@@ -1,0 +1,96 @@
+import random
+
+def criar_tabuleiro():
+    return [[' ' for _ in range(3)] for _ in range(3)]
+
+def imprimir_tabuleiro(tabuleiro):
+    for linha in tabuleiro:
+        linha_str = ""
+        for elemento in linha:
+            linha_str += " " + elemento + " |"
+        print(linha_str[:-1])
+        print("-" * 9)
+
+def verificar_vitoria(tabuleiro, simbolo):
+    for i in range(3):
+        if tabuleiro[i][0] == tabuleiro[i][1] == tabuleiro[i][2] == simbolo:
+            return True
+        if tabuleiro[0][i] == tabuleiro[1][i] == tabuleiro[2][i] == simbolo:
+            return True
+    if tabuleiro[0][0] == tabuleiro[1][1] == tabuleiro[2][2] == simbolo:
+        return True
+    if tabuleiro[0][2] == tabuleiro[1][1] == tabuleiro[2][0] == simbolo:
+        return True
+    return False
+
+def jogada_computador(tabuleiro, simbolo):
+    # Verifica se o computador pode ganhar na próxima jogada
+    for i in range(3):
+        for j in range(3):
+            if tabuleiro[i][j] == ' ':
+                tabuleiro[i][j] = simbolo
+                if verificar_vitoria(tabuleiro, simbolo):
+                    tabuleiro[i][j] = ' '  # Desfaz a jogada
+                    return i, j
+                tabuleiro[i][j] = ' '  # Desfaz a jogada
+
+    # Verifica se o jogador pode ganhar na próxima jogada e bloqueia
+    for i in range(3):
+        for j in range(3):
+            if tabuleiro[i][j] == ' ':
+                tabuleiro[i][j] = 'X' if simbolo == 'O' else 'O'
+                if verificar_vitoria(tabuleiro, 'X' if simbolo == 'O' else 'O'):
+                    tabuleiro[i][j] = ' '  # Desfaz a jogada
+                    return i, j
+                tabuleiro[i][j] = ' '  # Desfaz a jogada
+
+    # Escolhe uma jogada aleatória
+    vazias = [(i, j) for i in range(3) for j in range(3) if tabuleiro[i][j] == ' ']
+    if vazias:
+        return random.choice(vazias)
+    return None
+
+def jogo_da_velha():
+    tabuleiro = criar_tabuleiro()
+    simbolos = ["X", "O"]
+    jogador_atual = 0
+    jogadas = 0
+
+    while jogadas < 9:
+        imprimir_tabuleiro(tabuleiro)
+        if jogador_atual == 0:
+            linha, coluna = map(int, input(f"Sua vez, escolha a linha e coluna (0-2) para '{simbolos[jogador_atual]}', separados por espaço: ").split())
+        else:
+            jogada = jogada_computador(tabuleiro, simbolos[jogador_atual])
+            if jogada:
+                linha, coluna = jogada
+                print(f'O computador escolheu a posição {linha}, {coluna}')
+            else:
+                print("Empate!")
+                return
+
+        if tabuleiro[linha][coluna] == ' ':
+            tabuleiro[linha][coluna] = simbolos[jogador_atual]
+
+            if verificar_vitoria(tabuleiro, simbolos[jogador_atual]):
+                imprimir_tabuleiro(tabuleiro)
+                if jogador_atual == 0:
+                    print("Parabéns! Você venceu!")
+                else:
+                    print("O computador venceu!")
+                return
+
+            jogador_atual = 1 - jogador_atual
+            jogadas += 1
+        else:
+            print("Essa posição já está ocupada. Tente novamente.")
+
+    imprimir_tabuleiro(tabuleiro)
+    print("Empate!")
+
+jogo_da_velha()
+
+
+
+
+
